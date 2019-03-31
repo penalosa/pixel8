@@ -5,7 +5,7 @@ import "./registerServiceWorker";
 import RealTime from "./ws.js";
 Vue.config.productionTip = false;
 let store = { events: [] };
-RealTime("ws://api.cra.leurbost.com/rpc").then(server => {
+RealTime("ws://api.helloworldhack/rpc").then(server => {
   console.log(`Connected to server`);
   setInterval(() => server.ping({ ping: true }), 10000);
   Vue.prototype.$server = server;

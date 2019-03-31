@@ -21,6 +21,7 @@ export default Vue.extend({
       this.handleMouseDown
     );
     document.addEventListener("mousemove", this.handleMouseMove);
+    document.addEventListener("keydown", this.handleKeyDown);
     let bounding = (<HTMLElement>this.$refs.drawable).getBoundingClientRect();
     let { top, right, bottom, left } = bounding;
     this.rect = { top, right, bottom, left };
@@ -49,7 +50,27 @@ export default Vue.extend({
     };
   },
   methods: {
-    handleMouseMove(e: MouseEvent) {
+    handleKeyDown(e) {
+      if (e.keyCode == "38") {
+        this.mouse.y -= 2;
+      } else if (e.keyCode == "40") {
+        this.mouse.y += 2;
+      } else if (e.keyCode == "37") {
+        this.mouse.x -= 2;
+      } else if (e.keyCode == "39") {
+        this.mouse.x += 2;
+      } else if (e.keyCode == "32") {
+        this.handleMouseDown({
+          clientX: Math.floor(this.rect.left) + this.mouse.x,
+          clientY: Math.floor(this.rect.top) + this.mouse.y
+        });
+      }
+      this.handleMouseMove({
+        clientX: Math.floor(this.rect.left) + this.mouse.x,
+        clientY: Math.floor(this.rect.top) + this.mouse.y
+      });
+    },
+    handleMouseMove(e) {
       let { clientX, clientY } = e;
       this.mouse = {
         x: clientX - Math.floor(this.rect.left) - (clientX % 2),
@@ -100,90 +121,19 @@ export default Vue.extend({
       this.ctx!.fillRect(position.x - 1, position.y - 1, 2, 2);
     },
     handleMouseDown(e, colour, p) {
-      let target_colour = colour || {
-        a: 255,
-        r: Math.random() * 255,
-        g: Math.random() * 255,
-        b: Math.random() * 255
-      };
+      let target_colour =
+        colour ||
+        `rgb(${Math.random() * 255},
+        ${Math.random() * 255},
+        ${Math.random() * 255})`;
+      this.ctx!.fillStyle = target_colour;
+
       let position = p || this.mouse;
       if (!p) {
         this.$server.event({ colour: target_colour, position });
       }
-      let target_n =
-        0x0 +
-        (target_colour.a as number) +
-        0x100 * (target_colour.b as number) +
-        0x10000 * (target_colour.g as number) +
-        0x1000000 * (target_colour.r as number);
 
-      this.ctx!.fillStyle = `rgb(${target_colour.r}, ${target_colour.g}, ${
-        target_colour.b
-      })`;
-      let pixels = this.ctx!.getImageData(position.x - 3, position.y - 3, 6, 6);
-      let colours = [...pixels.data]
-        .reduce(
-          ({ acc, offset }, curr) => {
-            if (offset != 0) {
-              acc[acc.length - 1][offset] = curr;
-            } else {
-              acc.push([curr, 0, 0, 0]);
-            }
-            return { acc, offset: (offset + 1) % 4 };
-          },
-          { acc: [] as Number[][], offset: 0 }
-        )
-        .acc.map(a => ({ r: a[0], g: a[1], b: a[2], a: a[3] }))
-        .map((c, i) => ({ x: i % 6, y: Math.floor(i / 6), ...c }))
-        .map(({ x, y, ...r }) => ({ x: x - (x % 2), y: y - (y % 2), ...r }));
-      let pixel_map = [] as Number[][];
-      let scale = (a: number, b: number, m: number) =>
-        1 -
-        Math.pow(Math.pow(a - m / 2, 2) + Math.pow(b - m / 2, 2), 0.5) /
-          Math.pow(Math.pow(0 - m / 2, 2) + Math.pow(0 - m / 2, 2), 0.5);
-      colours.forEach(({ x, y, r, g, b, a }) => {
-        pixel_map[y / 2] = pixel_map[y / 2] || [];
-        let mean =
-          (0x0 +
-            (a as number) +
-            0x100 * (b as number) +
-            0x10000 * (g as number) +
-            0x1000000 * (r as number) +
-            target_n) /
-          2;
-
-        if (Math.random() > 0.5) {
-          pixel_map[y / 2][x / 2] =
-            (a as number) +
-            0x100 * (b as number) +
-            0x10000 * (g as number) +
-            0x1000000 * (r as number);
-        } else {
-          pixel_map[y / 2][x / 2] = Math.floor(mean);
-        }
-      });
-      let two_x_pixel_map = pixel_map.reduce(
-        (acc, curr) => [...acc, curr, curr],
-        [] as Number[][]
-      );
-      let image_data = two_x_pixel_map
-        .reduce((acc, curr) => [...acc, ...curr], [])
-        .map(o => [
-          ((o as number) & 0xff000000) >> 24,
-          ((o as number) & 0xff0000) >> 16,
-          ((o as number) & 0xff00) >> 8,
-          (o as number) & 0xff,
-          ((o as number) & 0xff000000) >> 24,
-          ((o as number) & 0xff0000) >> 16,
-          ((o as number) & 0xff00) >> 8,
-          (o as number) & 0xff
-        ])
-        .reduce((acc, curr) => [...acc, ...curr], []);
-      image_data.forEach((d, i) => {
-        pixels.data[i] = d;
-      });
-      console.log(position);
-      this.ctx!.putImageData(pixels, position.x - 3, position.y - 3);
+      this.ctx!.fillRect(position.x - 1, position.y - 1, 2, 2);
       if (!p) this.handleMouseMove(e);
     }
   },
