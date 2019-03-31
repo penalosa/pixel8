@@ -30,22 +30,30 @@ export default Vue.extend({
     this.previewCtx!.fillStyle = "rgb(2, 255, 0)";
     this.previewCtx!.fillRect(0, 0, 200, 200);
 
-    this.ctx!.fillStyle = "rgba(0, 0, 200, 0.5)";
-    this.ctx!.fillRect(30, 30, 50, 50);
-
     // Disable image anti-aliasing
     this.previewCtx!.imageSmoothingEnabled = false;
     this.$server.subscribe("add_event", data => {
-      console.log(data);
       this.handleMouseDown(null, data.colour, data.position);
     });
+    let background = new Image();
+    background.src = require("../../public/img/banner.png");
+
+    // Make sure the image is loaded first otherwise nothing will draw.
+    background.onload = () => {
+      this.ctx!.drawImage(background, 0, 0);
+      this.$server
+        .all()
+        .then(events =>
+          events.forEach(e => this.handleMouseDown(null, e.colour, e.position))
+        );
+    };
   },
   methods: {
     handleMouseMove(e: MouseEvent) {
       let { clientX, clientY } = e;
       this.mouse = {
-        x: clientX - this.rect.left - (clientX % 2),
-        y: clientY - this.rect.top - (clientY % 2)
+        x: clientX - Math.floor(this.rect.left) - (clientX % 2),
+        y: clientY - Math.floor(this.rect.top) - (clientY % 2)
       };
       this.previewCtx!.fillStyle = "rgb(255, 255, 255)";
       this.previewCtx!.fillRect(0, 0, 200, 200);
@@ -112,12 +120,7 @@ export default Vue.extend({
       this.ctx!.fillStyle = `rgb(${target_colour.r}, ${target_colour.g}, ${
         target_colour.b
       })`;
-      let pixels = this.ctx!.getImageData(
-        position.x - 5,
-        position.y - 5,
-        10,
-        10
-      );
+      let pixels = this.ctx!.getImageData(position.x - 3, position.y - 3, 6, 6);
       let colours = [...pixels.data]
         .reduce(
           ({ acc, offset }, curr) => {
@@ -131,7 +134,7 @@ export default Vue.extend({
           { acc: [] as Number[][], offset: 0 }
         )
         .acc.map(a => ({ r: a[0], g: a[1], b: a[2], a: a[3] }))
-        .map((c, i) => ({ x: i % 10, y: Math.floor(i / 10), ...c }))
+        .map((c, i) => ({ x: i % 6, y: Math.floor(i / 6), ...c }))
         .map(({ x, y, ...r }) => ({ x: x - (x % 2), y: y - (y % 2), ...r }));
       let pixel_map = [] as Number[][];
       let scale = (a: number, b: number, m: number) =>
@@ -148,7 +151,16 @@ export default Vue.extend({
             0x1000000 * (r as number) +
             target_n) /
           2;
-        pixel_map[y / 2][x / 2] = mean;
+
+        if (Math.random() > 0.5) {
+          pixel_map[y / 2][x / 2] =
+            (a as number) +
+            0x100 * (b as number) +
+            0x10000 * (g as number) +
+            0x1000000 * (r as number);
+        } else {
+          pixel_map[y / 2][x / 2] = Math.floor(mean);
+        }
       });
       let two_x_pixel_map = pixel_map.reduce(
         (acc, curr) => [...acc, curr, curr],
@@ -170,12 +182,14 @@ export default Vue.extend({
       image_data.forEach((d, i) => {
         pixels.data[i] = d;
       });
-      this.ctx!.putImageData(pixels, position.x - 5, position.y - 5);
+      console.log(position);
+      this.ctx!.putImageData(pixels, position.x - 3, position.y - 3);
       if (!p) this.handleMouseMove(e);
     }
   },
   data() {
     return {
+      hex: "",
       ctx: null as CanvasRenderingContext2D | null,
       previewCtx: null as CanvasRenderingContext2D | null,
       rect: {
