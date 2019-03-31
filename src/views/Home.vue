@@ -43,7 +43,7 @@ export default Vue.extend({
       this.handleMouseDown(null, data.colour, data.position);
     });
     let background = new Image();
-    background.src = require("../../public/square-gradient.png");
+    background.src = require("../../public/gradient.png");
 
     // Make sure the image is loaded first otherwise nothing will draw.
     background.onload = () => {
