@@ -1,6 +1,11 @@
 <template>
   <div class="home" ref="page">
-    <canvas id="drawable" width="600" height="600" ref="drawable"></canvas>
+    <canvas
+      id="drawable"
+      ref="drawable"
+      :width="rect.right-rect.left"
+      :height="rect.bottom-rect.top"
+    ></canvas>
     <canvas
       id="preview"
       width="200"
@@ -15,6 +20,7 @@
 import Vue from "vue";
 
 export default Vue.extend({
+  props: ["color"],
   mounted() {
     (<HTMLElement>this.$refs.drawable).addEventListener(
       "mousedown",
@@ -37,7 +43,7 @@ export default Vue.extend({
       this.handleMouseDown(null, data.colour, data.position);
     });
     let background = new Image();
-    background.src = require("../../public/img/banner.png");
+    background.src = require("../../public/gradient.png");
 
     // Make sure the image is loaded first otherwise nothing will draw.
     background.onload = () => {
@@ -121,11 +127,8 @@ export default Vue.extend({
       this.ctx!.fillRect(position.x - 1, position.y - 1, 2, 2);
     },
     handleMouseDown(e, colour, p) {
-      let target_colour =
-        colour ||
-        `rgb(${Math.random() * 255},
-        ${Math.random() * 255},
-        ${Math.random() * 255})`;
+      console.log(e);
+      let target_colour = colour || this.color;
       this.ctx!.fillStyle = target_colour;
 
       let position = p || this.mouse;
@@ -168,5 +171,15 @@ canvas#preview {
   left: 0px;
   border-radius: 160px;
   border: 2px solid black;
+  display: none;
+}
+
+canvas#drawable {
+  width: 75vw;
+  height: 75vh;
+}
+
+canvas#drawable:hover + canvas#preview, canvas#preview:hover {
+  display: initial;
 }
 </style>
