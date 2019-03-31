@@ -3,8 +3,8 @@
     <canvas
       id="drawable"
       ref="drawable"
-      :width="rect.right-rect.left"
-      :height="rect.bottom-rect.top"
+      :width="Math.floor(rect.right-rect.left)"
+      :height="Math.floor(rect.bottom-rect.top)"
     ></canvas>
     <canvas
       id="preview"
@@ -43,7 +43,7 @@ export default Vue.extend({
       this.handleMouseDown(null, data.colour, data.position);
     });
     let background = new Image();
-    background.src = require("../../public/gradient.png");
+    background.src = require("../../public/square-gradient.png");
 
     // Make sure the image is loaded first otherwise nothing will draw.
     background.onload = () => {
@@ -172,11 +172,12 @@ canvas#preview {
   border-radius: 160px;
   border: 2px solid black;
   display: none;
+  z-index: 999;
 }
 
 canvas#drawable {
   width: 75vw;
-  height: 75vh;
+  height: calc(100vh - 20px);
 }
 
 canvas#drawable:hover + canvas#preview, canvas#preview:hover {

@@ -11,7 +11,6 @@
     </div>
 
     <!-- Import javascript for Timeline -->
-    <div class="Timeline"></div>
 
     <!-- import javascript for Live_photo -->
     <div class="Live_Photo">
