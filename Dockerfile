@@ -12,4 +12,4 @@ RUN npm install -g serve
 COPY . .
 RUN npm run build
 
-CMD ["serve","-l","8000", "build"]
+CMD ["serve","-l","8000", "dist"]
