@@ -5,7 +5,7 @@ import "./registerServiceWorker";
 import RealTime from "./ws.js";
 Vue.config.productionTip = false;
 let store = { events: [] };
-RealTime("wss://pixel8-backend.muel.us/rpc").then(server => {
+RealTime("wss://pixel8.apps.penalosa.dev/rpc").then(server => {
   console.log(`Connected to server`);
   setInterval(() => server.ping({ ping: true }), 10000);
   Vue.prototype.$server = server;
