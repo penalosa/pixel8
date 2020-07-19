@@ -32,10 +32,7 @@
             id="myRange1"
             style="background-image: linear-gradient(to right, white, red , black); outline: solid; outline-color: black;"
           >
-          <p>
-            Red: {{c.red}}
-            <span id="slide1"></span>
-          </p>
+         
         </div>
         <div class="slide2container">
           <input
@@ -48,10 +45,7 @@
             id="myRange2"
             style="background-image: linear-gradient(to right, white, green , black);outline: solid; outline-color: black;"
           >
-          <p>
-            Green: {{c.green}}
-            <span id="slide2"></span>
-          </p>
+          
         </div>
         <div class="slide3container">
           <input
@@ -64,10 +58,7 @@
             id="myRange3"
             style="background-image: linear-gradient(to right, white, blue , black);outline: solid; outline-color: black;"
           >
-          <p>
-            Blue: {{c.blue}}
-            <span id="slide3"></span>
-          </p>
+          
         </div>
         <div :style="{'text-align':'center'}">
           <div
