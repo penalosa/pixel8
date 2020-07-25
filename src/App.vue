@@ -30,7 +30,7 @@
             value="128"
             class="slider"
             id="myRange1"
-            style="background-image: linear-gradient(to right, white, red , black); outline: solid; outline-color: black;"
+            style="background-image: linear-gradient(to left, white, red , black); outline: solid; outline-color: black;"
           >
          
         </div>
@@ -43,7 +43,7 @@
             value="128"
             class="slider"
             id="myRange2"
-            style="background-image: linear-gradient(to right, white, green , black);outline: solid; outline-color: black;"
+            style="background-image: linear-gradient(to left, white, green , black);outline: solid; outline-color: black;"
           >
           
         </div>
@@ -56,16 +56,21 @@
             value="128"
             class="slider"
             id="myRange3"
-            style="background-image: linear-gradient(to right, white, blue , black);outline: solid; outline-color: black;"
+            style="background-image: linear-gradient(to left, white, blue , black);outline: solid; outline-color: black;"
           >
           
         </div>
+
+        <!--CHOSEN COLOUR-->
         <div :style="{'text-align':'center'}">
           <div
             class="slide4container"
             :style="{background:`rgb(${c.red}, ${c.green}, ${c.blue})`, height:`40px`, display:'inline-block', 'margin-left':'0px'}"
           ></div>
+          <p>Chosen RGB=({{c.red}}, {{c.green}}, {{c.blue}})</p>
         </div>
+
+        
       </div>
     </aside>
   </div>
